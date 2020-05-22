@@ -37,6 +37,5 @@ As for partitioning of data sets. We partition raw data sets ![](http://latex.co
 
 ![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_accu.png)![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/xg_accu.PNG)
 ![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_time.jpg)![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/xg_time.jpg)
- <center class="half">
-    <img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_accu.png" width="200"/><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_accu.png" width="200"/><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_accu.png" width="200"/>
-</center>
+<center class="half"><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_accu.png" width="200"/><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/xg_accu.PNG" width="200"/></center>
+<center class="half"><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_time.jpg" width="200"/><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/xg_time.jpg" width="200"/></center>
