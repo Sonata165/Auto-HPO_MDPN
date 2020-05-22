@@ -18,8 +18,8 @@ Our contributions are summarized as follows.
 ## experiment
 
 ### data set
-**CNN** and **SVHN** for cnn, another 98 data sets for xgboost.
-
+**CNN** and **SVHN** for cnn, another 98 data sets for xgboost like in the following table.
+![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/1590134037879.png)
 ### baseline
 
 In this part, we introduce the baseline we choose briefly and basic settings about the experiments.
