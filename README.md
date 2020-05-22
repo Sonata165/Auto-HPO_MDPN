@@ -10,6 +10,7 @@ Our contributions are summarized as follows.
 
 ### flow
   The components of our algorithm are shown in this figure. Part1 is to train MDPN with processed data come from part2 and part3. In part4, MDPN is used to predict parameters, which are optimized further in part5.
+
 ![image](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/system.png)
 
 ## operation method
@@ -17,7 +18,7 @@ Our contributions are summarized as follows.
 ## experiment
 
 ### data set
-
+**CNN** and **SVHN** for cnn, another 98 data sets for xgboost.
 ### baseline
 
 In this part, we introduce the baseline we choose briefly and basic settings about the experiments.
@@ -35,7 +36,5 @@ In this part, we introduce the baseline we choose briefly and basic settings abo
 
 As for partitioning of data sets. We partition raw data sets ![](http://latex.codecogs.com/gif.latex?\mathcal{D}) into ![](http://latex.codecogs.com/gif.latex?\mathcal{X}) and ![](http://latex.codecogs.com/gif.latex?\mathbb{X}) with size 9:1, and ![](http://latex.codecogs.com/gif.latex?\mathcal{X}) is used to train MDPN before experiments. Then we continue to partition each data set in ![](http://latex.codecogs.com/gif.latex?\mathbb{X}) by 9:1 into ![](http://latex.codecogs.com/gif.latex?X_{train}) and ![](http://latex.codecogs.com/gif.latex?X_{test}). We firstly use ![](http://latex.codecogs.com/gif.latex?X_{train}) to train XGBoost or CNN, then we use ![](http://latex.codecogs.com/gif.latex?X_{test}) to test the performances of XGBoost or CNN with the hyper-parameters MDPN and baseline give out.
 
-![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_accu.png)![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/xg_accu.PNG)
-![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_time.jpg)![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/xg_time.jpg)
 <center class="half"><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_accu.png" width="200"/><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/xg_accu.PNG" width="200"/></center>
 <center class="half"><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/cnn_time.jpg" width="200"/><img src="https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/xg_time.jpg" width="200"/></center>
