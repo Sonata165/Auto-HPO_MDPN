@@ -19,17 +19,18 @@ Our contributions are summarized as follows.
 
 ### data set
 **CNN** and **SVHN** for cnn, another 98 data sets for xgboost.
+
 ### baseline
 
 In this part, we introduce the baseline we choose briefly and basic settings about the experiments.
 
 [**Bayesian optimization**](https://en.wikipedia.org/wiki/Bayesian_optimization) is shorted in BO, which is a sequential design strategy for global optimization of black-box functions that doesn't require derivatives. BO is widely used in hyper-parameter optimization. Here we use BO to optimize XGBoost as control group.
 
-[**Zeroth-order optimization**](https://arxiv.org/abs/1911.06317) is the process of minimizing an objective $f(x)$, given oracle access to evaluations at adaptive chosen input $x$, which is shorted as ZOOpt. Here we use ZOOpt as control group of evaluation of our model on CNN.
+[**Zeroth-order optimization**](https://arxiv.org/abs/1911.06317) is the process of minimizing an objective ![](http://latex.codecogs.com/gif.latex?f(x)), given oracle access to evaluations at adaptive chosen input ![](http://latex.codecogs.com/gif.latex?x), which is shorted as ZOOpt. Here we use ZOOpt as control group of evaluation of our model on CNN.
 
 **Metrics** we recorded in our experiments contains time overhead and accuracy of each test data set. We evaluate our model on hundreds of data sets, so some global statistics are necessary to take analyses. We extract median, maximum, and two quartiles of all test sets' accuracy.
 ### environment
-
+![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/1590133702076.png)
 
 ### result
   We design three groups experiments containing an experiment group, a blank control group(BCG) and a control group. In the experiment group, we use MDPN and MDPN + LOPT to take optimization. In the control group, BO and ZOOpt are used. In the blank control group, we optimize hyper-parameters with a MDPN or MDPN + LOPT model without pre-training.
