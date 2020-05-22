@@ -9,7 +9,7 @@ Our contributions are summarized as follows.
 - Experimental results on real data demonstrate that the proposed approach significantly outperforms the state-of-art algorithms in both accuracy and efficiency.
 
 ### flow
-![image]()
+![image](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/system.png)
 
 ## operation method
 
