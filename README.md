@@ -6,9 +6,10 @@ Our contributions are summarized as follows.
 
 - With XGBoost as an example, we design the neural network structure for the mapping as well as training approaches, which could be applied to other machine learning tasks with slight modification.
 
-\item Experimental results on real data demonstrate that the proposed approach significantly outperforms the state-of-art algorithms in both accuracy and efficiency.
-In the remaining of this paper,  Section~\ref{sec:method} describes the proposed approach. Experiments are conducted in Section~\ref{sec:exp}. We overview related work in Section~\ref{sec:related}. Section~\ref{sec:con} draws the conclusions.
+- Experimental results on real data demonstrate that the proposed approach significantly outperforms the state-of-art algorithms in both accuracy and efficiency.
 
+### flow
+![image]()
 
 ## operation method
 
