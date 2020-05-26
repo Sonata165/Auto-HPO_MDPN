@@ -1,8 +1,3 @@
-'''
-author:
-chargehand: Bozhou Chen
-important members: Kaixin Zhang, Longshen Ou, Chenmin Ba
-'''
 import numpy as np
 import sys
 
@@ -21,7 +16,7 @@ from keras.layers import Embedding, LSTM
 from keras.callbacks import *
 from keras.utils import multi_gpu_model
 from keras.layers import CuDNNLSTM
-from read_dataset import *
+from .ReadDataset import *
 from sklearn.utils import shuffle
 from math import *
 from sklearn.preprocessing import StandardScaler
@@ -34,12 +29,12 @@ if GPU:
 
 def main():
     '''
-    run build_nn2
+    run build_mdpn
     '''
-    build_nn2()
+    build_mdpn()
 
 
-def build_nn2():
+def build_mdpn():
     '''
     Read training set and shuffle
     Normalize dataset

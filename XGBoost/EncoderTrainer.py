@@ -26,8 +26,6 @@ class AutoEncoder:
         self.first_output_shape = first_output_shape
         self.second_output_shape = second_output_shape
         self.build_encoder_decoder()
-        # self.encoder1 = multi_gpu_model(self.encoder1, gpus=4)
-        # self.encoder2 = multi_gpu_model(self.encoder2, gpus=4)
 
     def set_model(self):
         '''
@@ -60,7 +58,6 @@ class AutoEncoder:
         """
         decoder = Activation('tanh')(decoder)
         self.auto_encoder1 = Model(inputs=[input_data], outputs=[decoder])
-        # self.auto_encoder1 = multi_gpu_model(self.auto_encoder1, gpus=4)
         self.auto_encoder1.compile(optimizer=keras.optimizers.Adam(0.01), loss=keras.losses.mse)
         # The seconde Encoder
         input_data = Input(self.first_output_shape)
@@ -78,7 +75,6 @@ class AutoEncoder:
         """
         decoder = Activation('tanh')(decoder)
         self.auto_encoder2 = Model(inputs=[input_data], outputs=[decoder])
-        # self.auto_encoder2 = multi_gpu_model(self.auto_encoder2, gpus=4)
         self.auto_encoder2.compile(optimizer=keras.optimizers.Adam(0.01), loss=keras.losses.mse)
         return self.encoder1, self.encoder2, self.auto_encoder1, self.auto_encoder2
 
@@ -94,25 +90,11 @@ class AutoEncoder:
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.8, patience=50, min_lr=0.0001)
         early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=True,
                                                    min_delta=0.01)
-        # check_point = keras.callbacks.ModelCheckpoint(filepath='./auto_encoder1_checkPoint.h5', monitor='val_loss',
-        #                                               save_best_only=True, verbose=1)
-        # tensor_board = keras.callbacks.TensorBoard(log_dir='./auto_encoder1_tensor_board_logs', write_grads=True,
-        #                                            write_graph=True,
-        #                                            write_images=True)
         self.auto_encoder1.fit(x, x, epochs=epoch, batch_size=batch_size, validation_split=0.1, verbose=0,
                                callbacks=[reduce_lr, early_stop])
-        # self.auto_encoder1.save('auto_encoder1.h5')
-        # self.encoder1.save('encoder1.h5')
         x1 = self.encoder1.predict(x)
-        # check_point = keras.callbacks.ModelCheckpoint(filepath='./auto_encoder2_checkPoint.h5', monitor='val_loss',
-        #                                               save_best_only=True, verbose=1)
-        # tensor_board = keras.callbacks.TensorBoard(log_dir='./auto_encoder2_tensor_board_logs', write_grads=True,
-        #                                            write_graph=True,
-        #                                            write_images=True)
         self.auto_encoder2.fit(x1, x1, epochs=epoch, batch_size=batch_size, validation_split=0.1, verbose=0,
                                callbacks=[reduce_lr, early_stop])
-        # self.auto_encoder2.save('auto_encoder2.h5')
-        # self.encoder2.save('encoder2.h5')
 
     def get_feature(self):
         '''

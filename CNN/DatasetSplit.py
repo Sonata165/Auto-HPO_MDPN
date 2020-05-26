@@ -2,14 +2,22 @@ import random
 import scipy.io as sio
 import numpy as np
 from keras.datasets import mnist
+
 bias = 400
+
+
 def main():
     split_dataset(name='mnist', subset_num=500, subset_size=80)
     split_dataset(name='svhn', subset_num=500, subset_size=400)
 
+
 def split_dataset(name, subset_num, subset_size):
     '''
     Do stratification sampling to MNIST dataset
+    :param name: the name of data set
+    :param subset_num: the number of subsets to be sampled
+    :param subset_size: the size of subsets to be sampled
+    :return: none
     '''
     if name == 'mnist':
         x_train, y_train, x_test, y_test = read_mnist_data()
@@ -39,13 +47,13 @@ def split_dataset(name, subset_num, subset_size):
     print(min)
     # Sample 20 times for MNIST and SVNH (maybe because the result is 6313, 6254)
 
-    for j in range(subset_num): # 20 groups
+    for j in range(subset_num):  # 20 groups
         print(j)
         temp_x = []
         temp_y = []
-        for i in range(subset_size): # 500 times each group
+        for i in range(subset_size):  # 500 times each group
             print(i)
-            d = random.randint(0, min-1)
+            d = random.randint(0, min - 1)
             for k in dic.keys():
                 temp_x.append(dic[k][i])
                 temp_y.append(k)
@@ -53,8 +61,9 @@ def split_dataset(name, subset_num, subset_size):
         temp_y = np.asarray(temp_y)
         print(temp_x.shape)
         print(temp_y.shape)
-        subset = {'X':temp_x, 'y':temp_y}
-        sio.savemat('../12.27_dataset/subset/' + name + '_subset' + str(j+bias) + '.mat', subset)
+        subset = {'X': temp_x, 'y': temp_y}
+        sio.savemat('../12.27_dataset/subset/' + name + '_subset' + str(j + bias) + '.mat', subset)
+
 
 def read_mnist_data():
     '''
@@ -68,6 +77,7 @@ def read_mnist_data():
 
     return (x_train, y_train, x_test, y_test)
 
+
 def read_svhn_data():
     '''
     Read and preprocess SVHN dataset
@@ -77,7 +87,7 @@ def read_svhn_data():
     X1 = mat1['X']
     x_train = []
     for i in range(X1.shape[3]):
-        x_train.append(X1[:,:,:,i])
+        x_train.append(X1[:, :, :, i])
     x_train = np.array(x_train)
     Y1 = mat1['y']
     for i in range(len(Y1)):
@@ -89,7 +99,7 @@ def read_svhn_data():
     X2 = mat2['X']
     x_test = []
     for i in range(X2.shape[3]):
-        x_test.append(X2[:,:,:,i])
+        x_test.append(X2[:, :, :, i])
     x_test = np.array(x_test)
     Y2 = mat2['y']
     for i in range(len(Y2)):
@@ -101,6 +111,7 @@ def read_svhn_data():
     x_test = x_test / 255
 
     return (x_train, y_train, x_test, y_test)
+
 
 if __name__ == '__main__':
     main()

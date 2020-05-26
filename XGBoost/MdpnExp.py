@@ -1,116 +1,28 @@
-import pandas as pd
-import xgboost as xgb
-import numpy as np
-from EncoderTrainer import *
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split, cross_val_score, KFold
+from .EncoderTrainer import *
 import keras
 import keras.backend as K
 import os
 import keras.models
-import tensorflow as tf
 from math import *
 import time
-from final import *
+from .Utils import *
 
 
 def main():
-    encode_CN_parameter()
+    mdpn_predict()
 
 
-def parameter_clean(parameter, range, include_min, include_max, type, delta=1e-5, inf=1e10):
+
+def mdpn_predict():
     '''
-    Clean the hyper-parameters.
-    '''
-    min = range[0]
-    max = range[1]
-    if min == 'inf':
-        min = -inf
-    if max == 'inf':
-        max = inf
-    p = parameter
-    # First, adjust the range of parameters
-    if include_min and p < min:
-        p = min
-    if not include_min and p <= min:
-        if type == 'int':
-            p = min + 1
-        else:
-            p = min + delta
-    if include_max and p > max:
-        p = max
-    if not include_max and p >= max:
-        if type == 'int':
-            p = max - 1
-        else:
-            p = max - delta
-    # Then adjust the type
-    if type == 'int':
-        p = int(p)
-    return p
-
-
-def handle(x_train, y_train, x_test, y_test, dic, n):
-    '''
-    Use XGBoost to do classification with a given set of hyper-parameters.
-    :param dic: a given set of hyper-parameters
-    '''
-    func = "multi:softmax"
-    func1 = "mlogloss"
-    if n == 2:
-        func = "binary:logitraw"
-        func1 = "logloss"
-
-    model = xgb.XGBClassifier(
-        booster='gbtree',
-        objective=func,
-        eval_metric='auc',
-        tree_method='exact',
-        silent=False,
-        n_jobs=4,
-        seed=7,
-        nthread=4,
-        max_delta_step=int(dic["max_delta_step"]),
-        gamma=dic["gamma"],
-        min_child_weight=int(dic["min_child_weight"]),
-        max_depth=int(dic["max_depth"]),
-        reg_lambda=dic["reg_lambda"],
-        reg_alpha=dic["reg_alpha"],
-        subsample=dic["subsample"],
-        colsample_bytree=dic["colsample_bytree"],
-        colsample_bylevel=dic["colsample_bylevel"],
-        learning_rate=dic["learning_rate"],
-        n_estimators=int(dic["n_estimators"]),
-    )
-
-    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1, random_state=33)
-
-    model.fit(x_train,
-              y_train,
-              eval_set=[(x_val, y_val)],
-              eval_metric=func1,
-              verbose=True)
-
-    ### make prediction for test data
-    y_pred = model.predict(x_test)
-
-    ### model evaluate
-    accuracy = accuracy_score(y_test, y_pred)
-    print("accuarcy: %.2f%%" % (accuracy * 100.0))
-    return accuracy
-
-
-def encode_CN_parameter():
-    '''
-    Run the experiment.
-    Read datasets, encode with the traind Encoder, predict optimized hyper-parameters using trained CoreNet,
-    use handle.py to test, output the results.
+    Read data sets, encode with the trained Encoder, predict optimized hyper-parameters using trained mdpn,
+    use handle() to test, output the results.
     '''
     # generate the list of paths
     path_list = os.listdir('TrainData/')
     result_path = os.listdir('result_CN_ACCU/')
     # read coreNet
-    path_core_network = 'ckpt.h5'
+    path_core_network = 'TrainedMdpn.h5'
     param_list = []
     filename_list = []  # used to save filenames
     for file in path_list:
@@ -147,13 +59,6 @@ def encode_CN_parameter():
         predict_params = core_net.predict(v)[0]
         K.clear_session()
         # redo nomalization
-        """
-        for ele in np.nditer(predict_params, op_flags=['readwrite']):
-            if ele > 0:
-                ele[...] = pow(10, ele)
-            elif ele < 0:
-                ele[...] = -pow(10, -ele)
-        """
         predict_params = np.arctanh(predict_params)
         predict_params[-1] = pow(10, predict_params[-1])
         predict_params[0] = pow(10, predict_params[0])
@@ -204,13 +109,13 @@ def encode_CN_parameter():
         except:
             print(file + 'Error, maybe y_val contains values not in y_train')
             with open('Error.log', 'a') as f:
-                f.write('from CNComp.py --' + file + 'Error, maybe y_val contains values not in y_train\n')
+                f.write('from MdpnExp.py --' + file + 'Error, maybe y_val contains values not in y_train\n')
             continue
         file = "result_CN_ACCU/result" + file[0:-4] + '.txt'
         with open(file, 'w', encoding="utf8") as f:
             f.write(str(ret) + "," + str(period))
             f.write("\n")
-    # save output of CoreNet
+    # save output of mdpn
     pd.DataFrame(np.array(param_list).T, columns=filename_list).to_csv('predicted_parameter.csv')
 
 

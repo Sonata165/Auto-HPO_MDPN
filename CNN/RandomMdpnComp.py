@@ -1,13 +1,3 @@
-'''
-ijcai group
-author:
-chargehand: Bozhou Chen
-important members: Kaixin Zhang, Longshen Ou, Chenmin Ba
-'''
-import numpy as np
-import sys
-# import preprocess  # 这个不用管，能运行
-import os
 import pandas as pd
 import keras
 import sys
@@ -20,12 +10,11 @@ from keras.layers import Embedding, LSTM
 from keras.callbacks import *
 from keras.utils import multi_gpu_model
 from keras.layers import CuDNNLSTM
-from read_dataset import *
+from .ReadDataset import *
 from sklearn.utils import shuffle
 from math import *
 from sklearn.preprocessing import StandardScaler
 
-sys.path.append('..')
 GPU = True
 
 if GPU:
@@ -63,7 +52,7 @@ def main():
     model.save('../12.27_dataset/CNNCoreNet_ckpt.h5')
 
 
-def build_nn2():
+def build_random_mdpn():
     feature_path = '../12.27_dataset/cn_train_data/feature/'
     label_path = '../12.27_dataset/new_result/'
     # Read two types of datasets

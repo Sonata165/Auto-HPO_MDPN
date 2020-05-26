@@ -5,7 +5,7 @@ from keras.layers import Conv2D, MaxPooling2D, AveragePooling2D, Flatten, Dense
 from keras.optimizers import Adam
 from keras.utils import multi_gpu_model
 from zoopt import Dimension, Objective, Parameter, Opt
-from read_dataset import *
+from .ReadDataset import *
 import matplotlib.pyplot as plt
 import os
 
@@ -62,12 +62,12 @@ def evaluate_param_multi_gpu(dataset, params, pid):
 
     c1_channel = params[0]
     c1_kernel = params[1]
-    c1_size2 = params[2]  # ？？？
-    c1_size3 = params[3]  # ？？？
+    c1_size2 = params[2]  #
+    c1_size3 = params[3]  #
     c2_channel = params[4]
     c2_kernel = params[5]
-    c2_size2 = params[6]  # ？？？
-    c2_size3 = params[7]  # ？？？
+    c2_size2 = params[6]  #
+    c2_size3 = params[7]  #
     p1_type = params[8]  # Pooling Type (max / avg)
     p1_kernel = params[9]  # kernel size
     p1_stride = params[10]  # stride size
@@ -299,8 +299,5 @@ def search(_dataset):
     return (solution.get_x(), solution.get_value())
 
 
-def search1(_dataset):
-    return ([1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4], 0.2)
-
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
