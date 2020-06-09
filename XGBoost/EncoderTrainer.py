@@ -105,5 +105,5 @@ class AutoEncoder:
                 [(1000,200,1),(201,50,1)]
         '''
         res = [self.encoder1.get_weights(), self.encoder2.get_weights()]
-        return [np.expand_dims(np.concatenate((res[0][0], res[0][1].reshape(1, -1)), axis=0),axis=-1),
-                np.expand_dims(np.concatenate((res[1][0], res[1][1].reshape(1, -1)), axis=0),axis=-1)]
+        return [np.expand_dims(np.concatenate((res[0][0], res[0][1].reshape(1, -1)), axis=0), axis=-1),
+                np.expand_dims(np.concatenate((res[1][0], res[1][1].reshape(1, -1)), axis=0), axis=-1)]

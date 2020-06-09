@@ -1,3 +1,5 @@
+import numpy as np
+
 def parameter_clean(parameter, range, include_min, include_max, type, delta=1e-5, inf=1e10):
     '''
     Clean Hyper-parameters
@@ -36,3 +38,22 @@ def parameter_clean(parameter, range, include_min, include_max, type, delta=1e-5
     if type == 'int':
         p = int(p)
     return p
+
+def analyze_feature(feature):
+    '''
+    flatten weight and bias which is to be the meta-feature
+    :param feature: the output of encoder
+    :return:
+    '''
+    ret = []
+    for i in range(0, len(feature)):
+        if i == 1 or i == 3 or i == 5:
+            continue
+        t1 = feature[i][0].flatten()
+        for j in t1:
+            ret.append(j)
+        t2 = feature[i][1].flatten()
+        for j in t2:
+            ret.append(j)
+    ret = np.array(ret)
+    return ret

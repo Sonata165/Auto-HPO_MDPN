@@ -12,6 +12,8 @@ import os
 from math import *
 import time
 
+from XGBoost.Utils import *
+
 EPSILON = 0.001
 EPSILON_threshold = 0.00001
 INF = 100000
@@ -70,7 +72,7 @@ def norm(P):
     :param P: hyper-parameters, Dict
     :return: hyper-parameters after range control, Dict
     '''
-    from .Utils import *
+
     keys = P.keys()
     for key in keys:
         p = P[key]

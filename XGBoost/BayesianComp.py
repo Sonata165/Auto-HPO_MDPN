@@ -8,7 +8,42 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, cross_val_score, KFold
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+from XGBoost.Utils import handle
+from XGBoost.Constants import *
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+
+def main():
+    input_folder = 'data/test/after_cutting/'
+    result_folder = 'results/bayesian/'
+    files = os.listdir(input_folder)
+    cnt = 0
+    po = multiprocessing.Pool(6)
+    for file in files:
+        if '.csv' not in file:
+            continue
+
+        print(file)
+        filename = file.split('.')[0]
+        cnt += 1
+        dataPath = "data/test/train_clf/" + file
+        df_train = pd.read_csv(dataPath)
+        x_train, y_train = getXY(df_train)
+        dataPath = "data/test/test_clf/" + file
+        df_train = pd.read_csv(dataPath)
+        x_test, y_test = getXY(df_train)
+
+        # Get distinct class number
+        num = set(y_train)
+        n = len(num)
+        print("The category number is " + str(n))
+
+        test_bayesian_accuracy(x_train, y_train, x_test, y_test, n, file)
+        # po.apply_async(test_bayesian_accuracy, (x_train, y_train, x_test, y_test, n, file,))
+    # po.close()
+    # po.join()
+
 
 def Bayes_parameter(x_train, y_train, n):
     '''
@@ -69,10 +104,8 @@ def Bayes_parameter(x_train, y_train, n):
     ret = rf_bo._space.max()
     return ret
 
+
 def getXY(df_train):
-    '''
-    Unknown function, maybe witten by Longshen or Bozhou
-    '''
     feature_name = []
     for x in df_train.columns:
         feature_name.append(x)
@@ -89,6 +122,7 @@ def getXY(df_train):
     y = np.array(list(df_train['Label'])).reshape(row_number)
     return x, y
 
+
 def test_bayesian_accuracy(x_train, y_train, x_test, y_test, n, file):
     start_time = time.time()  # record the start time
     params = Bayes_parameter(x_train, y_train, n)
@@ -97,42 +131,21 @@ def test_bayesian_accuracy(x_train, y_train, x_test, y_test, n, file):
     print('Took %f second' % (period))
     params = params["params"]
 
-    columns = ['max_delta_step', 'gamma', 'min_child_weight', 'max_depth', 'reg_lambda', 'subsample',
-               'colsample_bytree', 'colsample_bylevel', 'learning_rate', 'reg_alpha', 'n_estimators']
     lis = []
-    for string in columns:
+    for string in KEYS:
         lis.append(params[string])
-    df = pd.DataFrame([params], columns=columns)
-    outFile = 'BayesParameters/' + file
+
+    df = pd.DataFrame([params], columns=KEYS)
+    outFile = 'results/predicted_parameters_bayesian/' + file
     df.to_csv(outFile, index=False)
     print("file:" + file + " is saved,start handle function")
-    from .Utils import handle
+
     ret = handle(x_train, y_train, x_test, y_test, params, n)
-    path = "result_XGB_ACCU/result" + file[0:-4] + '.txt'
+    path = "results/bayesian/" + file[0:-4] + '.txt'
     with open(path, 'w', encoding="utf8") as f:
         f.write(str(ret) + "," + str(period))
         f.write("\n")
 
 
 if __name__ == "__main__":
-    lis = os.listdir("TrainData")
-    result_path = os.listdir('result_XGB_ACCU/')
-    cnt = 0
-    po = multiprocessing.Pool(6)
-    for name in lis:
-        if "result" + name[0:-4] + '.txt' in result_path:
-            continue
-        print(name + ": have done " + str(cnt) + " file.")
-        cnt += 1
-        dataPath = "TrainData/" + name
-        df_train = pd.read_csv(dataPath, encoding="utf8")
-        x_train, y_train = getXY(df_train)
-        dataPath = "TestData/" + name
-        df_train = pd.read_csv(dataPath, encoding="utf8")
-        x_test, y_test = getXY(df_train)
-        num = set(y_train)
-        n = len(num)
-        print("The category number is " + str(n))
-        po.apply_async(test_bayesian_accuracy, (x_train, y_train, x_test, y_test, n, name,))
-    po.close()
-    po.join()
+    main()

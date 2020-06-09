@@ -1,14 +1,17 @@
-import random
 import scipy.io as sio
 import numpy as np
 from keras.datasets import mnist
+from sklearn.model_selection import train_test_split
 
-bias = 400
+from CNN.Constants import *
 
 
 def main():
-    split_dataset(name='mnist', subset_num=500, subset_size=80)
-    split_dataset(name='svhn', subset_num=500, subset_size=400)
+    '''
+    Generate subsets of MNIST and SVHN, save to 'data/subset/'
+    '''
+    split_dataset(name='mnist', subset_num=SUBSET_NUM, subset_size=SUBSET_SIZE)
+    split_dataset(name='svhn', subset_num=SUBSET_NUM, subset_size=SUBSET_SIZE)
 
 
 def split_dataset(name, subset_num, subset_size):
@@ -35,40 +38,41 @@ def split_dataset(name, subset_num, subset_size):
             dic[y[i]].append(x[i])
         else:
             dic[y[i]] = [x[i]]
-    print(dic.keys())
-    print(len(dic[0]))
-    print(dic[0][0].shape)
 
     # Find minimum number of instances among all the classes
     min = len(y)
     for i in dic.keys():
         if (len(dic[i]) < min):
             min = len(dic[i])
-    print(min)
-    # Sample 20 times for MNIST and SVNH (maybe because the result is 6313, 6254)
 
-    for j in range(subset_num):  # 20 groups
+    seg1 = subset_num * 0.9
+    for j in range(subset_num):
         print(j)
         temp_x = []
         temp_y = []
-        for i in range(subset_size):  # 500 times each group
-            print(i)
-            d = random.randint(0, min - 1)
+        for i in range(subset_size):
             for k in dic.keys():
                 temp_x.append(dic[k][i])
                 temp_y.append(k)
         temp_x = np.asarray(temp_x)
         temp_y = np.asarray(temp_y)
-        print(temp_x.shape)
-        print(temp_y.shape)
-        subset = {'X': temp_x, 'y': temp_y}
-        sio.savemat('../12.27_dataset/subset/' + name + '_subset' + str(j + bias) + '.mat', subset)
+        if j < seg1:
+            subset = {'X': temp_x, 'y': temp_y}
+            sio.savemat('data/subset/' + name + '_subset' + str(j) + '.mat', subset)
+        else:
+            (x_train, x_test, y_train, y_test) = train_test_split(temp_x, temp_y, test_size=0.1)
+            print(y_train.shape)
+            subset_1 = {'X': x_train, 'y': y_train}
+            subset_2 = {'X': x_test, 'y': y_test}
+            sio.savemat('data/experiment_data/train_data/' + name + '_subset' + str(j) + '.mat', subset_1)
+            sio.savemat('data/experiment_data/test_data/' + name + '_subset' + str(j) + '.mat', subset_2)
 
 
 def read_mnist_data():
     '''
     Read and preprocess MNIST dataset
     :return: (x_train, y_train, x_test, y_test)
+
     '''
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
@@ -83,7 +87,7 @@ def read_svhn_data():
     Read and preprocess SVHN dataset
     :return: (x_train, y_train, x_test, y_test)
     '''
-    mat1 = sio.loadmat('../12.27_dataset/train_32x32.mat')
+    mat1 = sio.loadmat('data/svhn/train_32x32.mat')
     X1 = mat1['X']
     x_train = []
     for i in range(X1.shape[3]):
@@ -95,7 +99,7 @@ def read_svhn_data():
             Y1[i] = 0
     y_train = Y1.reshape(Y1.shape[0])
 
-    mat2 = sio.loadmat('../12.27_dataset/test_32x32.mat')
+    mat2 = sio.loadmat('data/svhn/test_32x32.mat')
     X2 = mat2['X']
     x_test = []
     for i in range(X2.shape[3]):

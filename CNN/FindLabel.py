@@ -1,8 +1,5 @@
-import os
-import pickle as pk
-from .ReadDataset import *
-from multiprocessing import Pool
-from .ZooptUtils import search
+from CNN.ReadDataset import *
+from CNN.ZooptUtils import search
 
 flag = 0
 
@@ -18,8 +15,8 @@ def main():
     dataset2    a2      b2              s2
         ...
     '''
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(flag)
-    find_label_local()
+    # os.environ["CUDA_VISIBLE_DEVICES"] = str(flag)
+    find_label()
 
 
 def prt(i):
@@ -27,30 +24,29 @@ def prt(i):
         print(i)
 
 
-def find_label_local():
+def find_label():
     '''
     Find optimized hyper-parameters for all datasets using ZOOpt
     '''
-    DATASET_PATH = '../12.27_dataset/subset/'
+    DATASET_PATH = 'data/subset/'
     files = os.listdir(DATASET_PATH)
-    RESULT_PATH = '../12.27_dataset/result/'
-    reslts = os.listdir(RESULT_PATH)
-    for i in range(1, 11):
-        index = -1 * i
-        file = files[index]
+    RESULT_PATH = 'data/result/'
+    results = os.listdir(RESULT_PATH)
+    for file in files:
+        filename = file.split('.')[0]
         print('********************************************')
         print(file)
         # If already computed, then skip
         dataset = read_dataset(DATASET_PATH + file)
-        this_name = file + '.pkl'
-        if this_name in reslts:
+        this_name = filename + '.pkl'
+        if this_name in results:
             continue
 
         # Else, find the optimized hyper-parameters
         param, result = search(dataset)
 
         # save to pkl file
-        f = open('../12.27_dataset/result/' + file + '.pkl', 'wb')
+        f = open('data/result/' + file[:-4] + '.pkl', 'wb')
         pk.dump(param, f)
         pk.dump(result, f)
         f.close()

@@ -8,6 +8,7 @@ import os
 import pandas as pd
 import keras
 import sys
+import pickle
 from keras.layers import *
 from keras.models import load_model
 from keras.models import Sequential
@@ -18,48 +19,41 @@ from keras.callbacks import *
 from keras.utils import multi_gpu_model
 from keras.layers import CuDNNLSTM
 
+from XGBoost.Constants import *
 
 def main():
     '''
     Train the MDPN
     '''
 
-    inputpath = 'data_encoded/'
-    outputpath = 'data_ok/'
-    import pickle
+    inputpath = 'meta_features/'
+    outputpath = 'labels/'
 
     x_temp = []
     x_train1 = None
     x_train2 = None
     y = []
-    # TODO
-    exislis = os.listdir('TrainData/')
+    folder = 'data/train/meta_features/'
+    files = os.listdir(folder)
     # 2874
-    for i in range(1, 500):
-        print(i)
-        try:
-            if i == 2245:
-                continue
-            if exislis.__contains__(str(i) + '.csv'):
-                continue
-            file = open(inputpath + str(i) + '.json', 'rb')
-            x_temp = pickle.load(file)
+    for file in files:
+        print(file)
+        with open(folder + file, 'rb') as f:
+            # Read meta-features
+            x_temp = pickle.load(f)
             x_temp[0] = x_temp[0].tolist()
             x_temp[1] = x_temp[1].tolist()
-            file.close()
             if x_train1 is None:
                 x_train1 = [x_temp[0]]
                 x_train2 = [x_temp[1]]
             else:
                 x_train1.append(x_temp[0])
                 x_train2.append(x_temp[1])
-            df = pd.read_csv(outputpath + str(i) + 'label.csv').values
-            y.append(df[0])
-        except:
-            file = open('log.txt', 'a')
-            file.write(str(i) + 'exception occur')
-            file.close()
-            continue
+
+            # Read labels
+            label = pd.read_csv('data/train/labels/' + file.split('.')[0] + '.csv', index_col=0, header=None).values
+            label = label.reshape(-1)
+            y.append(label)
     x_train1 = np.array(x_train1)
     x_train2 = np.array(x_train2)
     y = np.array(y)
@@ -70,8 +64,7 @@ def main():
     y = np.tanh(y)
     print(y.shape)
     print('begin to train!')
-    if os.path.isdir('./tensor_board_logs'):    shutil.rmtree('./tensor_board_logs')
-    train([x_train1, x_train2], y, int(1e3), 128)
+    train(x_train=[x_train1, x_train2], y_train=y, epoch=MDPN_EPOCHS, batch_size=MDPN_BATCH_SIZE)
 
 
 def normalize():
@@ -95,17 +88,16 @@ def normalize():
     return
 
 
-def train(x_train, y, epoch, batch_size):
+def train(x_train, y_train, epoch, batch_size):
     '''
-    if nn.h5 is empty, train from beginning,
+    If model.h5 is empty, train from beginning,
     else train from nn.h5's model,
-    use the data from data_ok's data.csv,
+    use the data from labels's data.csv,
     save the model in nn.h5.
     :param x_train: train data
-    :param y: labels of train data
+    :param y_train: labels of train data
     :param epoch: epoch of MDPN
     :param batch_size: training batch size of MDPN
-    :return: none
     '''
     input_dim_weights = (1001, 200, 1)
     input_dim_bias = (201, 50, 1)
@@ -127,25 +119,24 @@ def train(x_train, y, epoch, batch_size):
     layer = Dense(256, activation='tanh')(layer)
     layer = Dropout(0.3)(layer)
     layer = BatchNormalization()(layer)
-    layer = Dense(64)(layer)
+    layer = Dense(64, activation='tanh')(layer)
     layer = Dropout(0.3)(layer)
     layer = BatchNormalization()(layer)
     layer = ELU()(layer)
-
     layer = Dense(11, activation='tanh')(layer)
     model = Model(inputs=[input_weights, input_bias], outputs=[layer])
 
     reduce_lr = ReduceLROnPlateau(monitor='loss', patience=5, mode='min', factor=0.8)
     check_point = ModelCheckpoint(filepath='TrainedMdpn.h5', monitor='val_loss', verbose=1, save_best_only=True,
                                   save_weights_only=False, period=5)
-    tensor_board = keras.callbacks.TensorBoard(log_dir='./tensor_board_logs', write_grads=True, write_graph=True,
-                                               write_images=True)
+    # tensor_board = keras.callbacks.TensorBoard(log_dir='./tensor_board_logs', write_grads=True, write_graph=True,
+    #                                            write_images=True)
     early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=100, restore_best_weights=True)
     model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(0.01, clipnorm=1.0))
     model.summary()
-    model.fit(x=x_train, y=y, epochs=epoch, validation_split=0.1, verbose=1, shuffle=True, batch_size=batch_size,
-              callbacks=[reduce_lr, check_point, tensor_board])
-    return
+    model.fit(x=x_train, y=y_train, epochs=epoch, validation_split=0.1, verbose=1, shuffle=True, batch_size=batch_size,
+              callbacks=[reduce_lr, check_point])
+    model.save('model.h5')
 
 
 def predict(vector):

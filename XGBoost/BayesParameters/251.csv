@@ -1,2 +1,0 @@
-max_delta_step,gamma,min_child_weight,max_depth,reg_lambda,subsample,colsample_bytree,colsample_bylevel,learning_rate,reg_alpha,n_estimators
-8.407939270109777,0.0,0.0,16.392774632388775,1.7437644188038988,0.999999999545101,0.9244653400018774,1.0,0.2,0.0,134.17636022299146

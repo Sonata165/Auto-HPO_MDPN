@@ -1,44 +1,35 @@
-import pickle as pk
-import numpy as np
 import keras.backend as bk
-from .ReadDataset import *
 import keras
-from keras.layers import *
-from keras.models import *
 import keras.backend as K
-from keras.utils import multi_gpu_model
+from keras.layers import MaxPooling2D, Conv2D, Flatten, Dense, Concatenate, Reshape, UpSampling2D
+from keras.models import *
+
+from CNN.ReadDataset import *
+from CNN.Constants import *
 
 flag = 0
+
 
 def main():
     compute_feature()
 
 
 def compute_feature():
-    DATASET_PATH = '../12.27_dataset/subset/'
-    files = os.listdir(DATASET_PATH)
-    RESULT_PATH = '../12.27_dataset/feature/'
-    reslts = os.listdir(RESULT_PATH)
+    dataset_path = 'data/subset/'
+    result_path = 'data/feature/'
+    files = os.listdir(dataset_path)
     for file in files:
-        if 'mnist' in file:
-            num = int(file[12:-4])
-        else:
-            num = int(file[11:-4])
-        if num % 8 != flag:
-            continue
-        this_name = file + '.pkl'
-
-        if this_name in reslts:
-            continue
-        dataset = read_dataset(DATASET_PATH + file, padding=True)
-
+        print(file)
+        filename = file.split('.')[0]
+        dataset = read_dataset(dataset_path + file, padding=True)
 
         # Else, do Encoding
         feature = encode(dataset)
 
         # save as pkl file
-        with open('../12.27_dataset/feature/' + file + '.pkl', 'wb') as f:
+        with open(result_path + filename + '.pkl', 'wb') as f:
             pk.dump(feature, f)
+        print(file + " finish!")
 
 
 def encode(dataset):
@@ -51,19 +42,20 @@ def encode(dataset):
     y = np.concatenate((y_train, y_test))
     print('x shape:', x[0].shape)
     encoder = AutoEncoder(input_shape=x[0].shape, label_shape=(10,))
-    encoder.train([x, y], epoch=100, batch_size=32)
+    encoder.train([x, y], epoch=ENCODER_EPOCHS, batch_size=ENCODER_BATCH_SIZE)
     ret = encoder.get_feature()
     bk.clear_session()
     return ret
 
 
-def encode_xy(dataset,epochs=50,batchsize=32):
+def encode_xy(dataset, epochs=ENCODER_EPOCHS, batchsize=ENCODER_BATCH_SIZE):
     x, y = dataset
     encoder = AutoEncoder(input_shape=x[0].shape, label_shape=(10,))
     encoder.train([x, y], epoch=epochs, batch_size=batchsize)
     ret = encoder.get_feature()
     bk.clear_session()
     return ret
+
 
 class AutoEncoder:
     def __init__(self, input_shape, label_shape, auto_encoder=None, encoder=None):
@@ -87,7 +79,7 @@ class AutoEncoder:
         Read pretrained model from file
         '''
         # self.encoder = load_model('encoder.h5')
-        self.auto_encoder = load_model('auto_encoder.h5')
+        self.auto_encoder = load_model('model/auto_encoder.h5')
 
     def build_encoder_decoder(self):
         '''
@@ -130,7 +122,7 @@ class AutoEncoder:
         self.auto_encoder = Model(inputs=[input_data, input_label], outputs=[decoded, label])
 
         self.auto_encoder.compile(optimizer=keras.optimizers.Adam(0.001), loss=keras.losses.mse)
-        self.auto_encoder.summary()
+        # self.auto_encoder.summary()
         return self.auto_encoder
 
     def predict(self, input_data):
@@ -161,3 +153,7 @@ class AutoEncoder:
         for i in range(1, 9):
             res.append(self.auto_encoder.get_layer(st + str(i)).get_weights())
         return res
+
+
+if __name__ == "__main__":
+    main()
