@@ -1,4 +1,4 @@
-## introduction and flow
+## Introduction and Flow Chart
   Automatic machine learning (AutoML) has gained wide attention and applications in both industry and academia. Automatic hyper-parameter optimization(auto-HPO) is one of the most critical parts. The effectiveness of many machine learning algorithms is extremely sensitive to hyper-parameters. Without a good set of hyper-parameters, the task cannot be solved well even with the optimal algorithm.
 
 Our contributions are summarized as follows.
@@ -8,16 +8,16 @@ Our contributions are summarized as follows.
 
 - Experimental results on real data demonstrate that the proposed approach significantly outperforms the state-of-art algorithms in both accuracy and efficiency.
 
-### flow
+### Flow Chart
   The components of our algorithm are shown in this figure. Part1 is to train MDPN with processed data come from part2 and part3. In part4, MDPN is used to predict parameters, which are optimized further in part5.
 
 ![image](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/system.png)
 
-## operation method
+## Operation Methods
 
-## experiment
+## Experiment
 
-### data set
+### Data set
 **CNN** and **SVHN** for cnn, another 98 data sets for xgboost like in the following table.
 ![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/1590134037879.png)
 ### baseline
@@ -29,10 +29,10 @@ In this part, we introduce the baseline we choose briefly and basic settings abo
 [**Zeroth-order optimization**](https://arxiv.org/abs/1911.06317) is the process of minimizing an objective ![](http://latex.codecogs.com/gif.latex?f(x)), given oracle access to evaluations at adaptive chosen input ![](http://latex.codecogs.com/gif.latex?x), which is shorted as ZOOpt. Here we use ZOOpt as control group of evaluation of our model on CNN.
 
 **Metrics** we recorded in our experiments contains time overhead and accuracy of each test data set. We evaluate our model on hundreds of data sets, so some global statistics are necessary to take analyses. We extract median, maximum, and two quartiles of all test sets' accuracy.
-### environment
+### Environment
 ![](https://github.com/Sonata165/NIPSProject/blob/master/ImgForReadme/1590133702076.png)
 
-### result
+### Result
   We design three groups experiments containing an experiment group, a blank control group(BCG) and a control group. In the experiment group, we use MDPN and MDPN + LOPT to take optimization. In the control group, BO and ZOOpt are used. In the blank control group, we optimize hyper-parameters with a MDPN or MDPN + LOPT model without pre-training.
 
 As for partitioning of data sets. We partition raw data sets ![](http://latex.codecogs.com/gif.latex?\mathcal{D}) into ![](http://latex.codecogs.com/gif.latex?\mathcal{X}) and ![](http://latex.codecogs.com/gif.latex?\mathbb{X}) with size 9:1, and ![](http://latex.codecogs.com/gif.latex?\mathcal{X}) is used to train MDPN before experiments. Then we continue to partition each data set in ![](http://latex.codecogs.com/gif.latex?\mathbb{X}) by 9:1 into ![](http://latex.codecogs.com/gif.latex?X_{train}) and ![](http://latex.codecogs.com/gif.latex?X_{test}). We firstly use ![](http://latex.codecogs.com/gif.latex?X_{train}) to train XGBoost or CNN, then we use ![](http://latex.codecogs.com/gif.latex?X_{test}) to test the performances of XGBoost or CNN with the hyper-parameters MDPN and baseline give out.
